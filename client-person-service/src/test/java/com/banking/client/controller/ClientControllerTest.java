@@ -8,6 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -82,13 +86,16 @@ class ClientControllerTest {
     @Test
     void getAllClients_Success() throws Exception {
         // Given
-        when(clientService.getAllClients()).thenReturn(Arrays.asList(clientDto));
+        Pageable pageable = PageRequest.of(0, 20);
+        Page<ClientDto> clientPage = new PageImpl<>(Arrays.asList(clientDto), pageable, 1);
+        when(clientService.getAllClients(any(Pageable.class))).thenReturn(clientPage);
 
         // When & Then
         mockMvc.perform(get("/clientes"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].nombre").value("Jose Lema"));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].nombre").value("Jose Lema"))
+                .andExpect(jsonPath("$.totalElements").value(1));
     }
 
     @Test
