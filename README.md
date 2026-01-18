@@ -495,16 +495,6 @@ export SPRING_PROFILES_ACTIVE=debug
 docker-compose up -d
 ```
 
-## 🤝 Contribución
-
-### Cómo Contribuir
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
 ### Estándares de Código
 
 - Sigue las convenciones de Java
@@ -512,21 +502,3 @@ docker-compose up -d
 - Documenta APIs con comentarios Javadoc
 - Mantén cobertura de tests > 80%
 
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
-
-## 👥 Autores
-
-- **Tu Nombre** - *Desarrollo inicial* - [GitHub](https://github.com/tu-usuario)
-
-## 🙏 Agradecimientos
-
-- Spring Framework Team
-- Docker Community
-- MySQL Team
-- Todos los contribuidores de código abierto
-
----
-
-**¡Gracias por usar Banking Microservices! 🏦✨**
