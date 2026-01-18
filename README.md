@@ -529,14 +529,4 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 
 ---
 
-## 📞 Soporte
-
-Si tienes preguntas o necesitas ayuda:
-
-- 📧 Email: tu-email@ejemplo.com
-- 🐛 Issues: [GitHub Issues](https://github.com/tu-usuario/banking-microservices/issues)
-- 📖 Documentación: [Wiki del Proyecto](https://github.com/tu-usuario/banking-microservices/wiki)
-
----
-
 **¡Gracias por usar Banking Microservices! 🏦✨**
