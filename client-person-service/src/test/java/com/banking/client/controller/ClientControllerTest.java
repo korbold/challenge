@@ -54,16 +54,41 @@ class ClientControllerTest {
         clientDto.setContrasena("1234");
         clientDto.setEstado(true);
     }
+    
+    private ClientDto createClientDtoWithoutId() {
+        ClientDto dto = new ClientDto();
+        dto.setNombre("Jose Lema");
+        dto.setGenero("M");
+        dto.setEdad(30);
+        dto.setIdentificacion("1234567890");
+        dto.setDireccion("Otavalo sn y principal");
+        dto.setTelefono("0982547856");
+        dto.setContrasena("1234");
+        dto.setEstado(true);
+        return dto;
+    }
 
     @Test
     void createClient_Success() throws Exception {
         // Given
+        ClientDto createDto = createClientDtoWithoutId();
         when(clientService.createClient(any(ClientDto.class))).thenReturn(clientDto);
 
-        // When & Then
+        // When & Then - Create JSON manually to ensure contrasena is included
+        String jsonContent = "{"
+            + "\"nombre\":\"Jose Lema\","
+            + "\"genero\":\"M\","
+            + "\"edad\":30,"
+            + "\"identificacion\":\"1234567890\","
+            + "\"direccion\":\"Otavalo sn y principal\","
+            + "\"telefono\":\"0982547856\","
+            + "\"contrasena\":\"1234\","
+            + "\"estado\":true"
+            + "}";
+        
         mockMvc.perform(post("/clientes")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(clientDto)))
+                .content(jsonContent))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.clienteId").value(1L))
                 .andExpect(jsonPath("$.nombre").value("Jose Lema"))
@@ -125,10 +150,21 @@ class ClientControllerTest {
         // Given
         when(clientService.updateClient(anyLong(), any(ClientDto.class))).thenReturn(clientDto);
 
-        // When & Then
+        // When & Then - Create JSON manually to ensure contrasena is included
+        String jsonContent = "{"
+            + "\"nombre\":\"Jose Lema\","
+            + "\"genero\":\"M\","
+            + "\"edad\":30,"
+            + "\"identificacion\":\"1234567890\","
+            + "\"direccion\":\"Otavalo sn y principal\","
+            + "\"telefono\":\"0982547856\","
+            + "\"contrasena\":\"1234\","
+            + "\"estado\":true"
+            + "}";
+
         mockMvc.perform(put("/clientes/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(clientDto)))
+                .content(jsonContent))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.clienteId").value(1L))
                 .andExpect(jsonPath("$.nombre").value("Jose Lema"));

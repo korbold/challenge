@@ -4,6 +4,7 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2023.0.0-blue.svg)](https://spring.io/projects/spring-cloud)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-blue.svg)](https://www.mysql.com/)
+[![Kafka](https://img.shields.io/badge/Apache%20Kafka-Streaming-black.svg)](https://kafka.apache.org/)
 [![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED.svg)](https://www.docker.com/)
 [![Maven](https://img.shields.io/badge/Maven-3.6+-red.svg)](https://maven.apache.org/)
 
@@ -36,7 +37,9 @@ graph TB
     Gateway --> AccountService[Account Service :8082]
     ClientService --> MySQL[(MySQL :3306)]
     AccountService --> MySQL
-    AccountService --> ClientService
+    ClientService -.->|Async Events| Kafka[Apache Kafka]
+    Kafka -.->|Async Events| AccountService
+    AccountService -->|Sync Queries| ClientService
 ```
 
 ### Componentes Principales
@@ -48,6 +51,8 @@ graph TB
 | **Client-Person Service** | 8081 | Gestión de clientes y personas |
 | **Account-Movement Service** | 8082 | Gestión de cuentas y movimientos |
 | **MySQL Database** | 3306 | Base de datos principal |
+| **Apache Kafka** | 9092 | Message broker para comunicación asíncrona |
+| **Zookeeper** | 2181 | Coordinador de Kafka |
 
 ## ✨ Características Implementadas
 
@@ -63,6 +68,8 @@ graph TB
 
 - **Service Discovery**: Registro automático de servicios con Eureka
 - **API Gateway**: Enrutamiento centralizado y balanceamiento de carga
+- **Comunicación Asíncrona**: Eventos distribuidos mediante Apache Kafka
+- **Comunicación Síncrona**: Consultas inmediatas mediante Feign Client (circuit breaker)
 - **Base de Datos**: Esquema normalizado con relaciones optimizadas
 - **Docker**: Containerización completa para fácil despliegue
 - **Testing**: Cobertura de pruebas unitarias e integración
@@ -77,7 +84,10 @@ graph TB
 - **Spring Cloud 2023.0.0** - Microservicios
 - **Spring Data JPA** - Persistencia de datos
 - **Spring Web** - APIs REST
+- **Spring Kafka** - Integración con Apache Kafka para eventos asíncronos
 - **Spring Security** - Autenticación y autorización
+- **OpenFeign** - Cliente HTTP declarativo para comunicación síncrona
+- **Resilience4j** - Circuit breaker y resiliencia
 
 ### Base de Datos
 - **MySQL 8.0** - Base de datos relacional
@@ -88,6 +98,8 @@ graph TB
 - **Maven** - Gestión de dependencias
 - **Eureka** - Service Discovery
 - **Spring Cloud Gateway** - API Gateway
+- **Apache Kafka** - Message broker para comunicación asíncrona
+- **Zookeeper** - Coordinador de Kafka
 
 ### Testing
 - **JUnit 5** - Framework de testing
@@ -291,6 +303,49 @@ curl -X POST http://localhost:8080/movimientos \
 ### Colección de Postman
 
 Importa la colección `Banking-API.postman_collection.json` en Postman para tener acceso a todos los endpoints con ejemplos preconfigurados.
+
+## 🔄 Comunicación Asíncrona con Kafka
+
+### Arquitectura de Eventos
+
+El sistema implementa **comunicación asíncrona** entre microservicios mediante Apache Kafka, cumpliendo con el requisito de nivel SemiSenior:
+
+- **Client-Person Service** actúa como **productor** de eventos
+- **Account-Movement Service** actúa como **consumidor** de eventos
+- Los eventos se publican cuando se crea, actualiza o elimina un cliente
+- La comunicación asíncrona permite desacoplamiento y escalabilidad
+
+### Flujo de Eventos
+
+1. **Creación de Cliente**: Cuando se crea un cliente, se publica un evento `CREATED` a Kafka
+2. **Actualización de Cliente**: Cuando se actualiza un cliente, se publica un evento `UPDATED` a Kafka
+3. **Eliminación de Cliente**: Cuando se elimina un cliente, se publica un evento `DELETED` a Kafka
+4. **Consumo Asíncrono**: El servicio de cuentas consume estos eventos de manera asíncrona
+
+### Topic de Kafka
+
+- **Topic**: `client-events`
+- **Group ID**: `account-movement-service-group`
+
+### Comunicación Híbrida
+
+El sistema utiliza un enfoque híbrido:
+
+- **Comunicación Asíncrona (Kafka)**: Para eventos y notificaciones (creación, actualización, eliminación)
+- **Comunicación Síncrona (Feign)**: Para consultas inmediatas cuando se necesita respuesta en tiempo real (validación de cliente al crear cuenta)
+
+### Verificar Kafka
+
+```bash
+# Ver logs de Kafka
+docker-compose logs -f kafka
+
+# Verificar que Kafka esté funcionando
+docker exec -it banking-kafka kafka-topics --list --bootstrap-server localhost:9092
+
+# Ver eventos en el topic
+docker exec -it banking-kafka kafka-console-consumer --bootstrap-server localhost:9092 --topic client-events --from-beginning
+```
 
 ## 🗄️ Base de Datos
 

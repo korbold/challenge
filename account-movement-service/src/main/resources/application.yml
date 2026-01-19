@@ -21,6 +21,16 @@ spring:
   h2:
     console:
       enabled: ${SPRING_H2_CONSOLE_ENABLED:false}
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: account-movement-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: true
+      properties:
+        spring.json.trusted.packages: "*"
 
 eureka:
   client:
@@ -59,3 +69,4 @@ logging:
   level:
     com.banking.account: DEBUG
     org.springframework.web: DEBUG
+    org.springframework.kafka: INFO

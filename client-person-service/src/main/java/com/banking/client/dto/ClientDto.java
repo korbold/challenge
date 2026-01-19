@@ -1,6 +1,6 @@
 package com.banking.client.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -42,7 +42,7 @@ public class ClientDto {
     
     @NotBlank(message = "Password is required")
     @Size(min = 4, max = 20, message = "Password must be between 4 and 20 characters")
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String contrasena;
     
     @NotNull(message = "Status is required")

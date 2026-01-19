@@ -27,6 +27,9 @@ public class ClientService {
     @Autowired
     private ClientRepository clientRepository;
     
+    @Autowired
+    private ClientEventPublisher eventPublisher;
+    
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private static final Logger logger = LoggerFactory.getLogger(ClientService.class);
     
@@ -60,7 +63,12 @@ public class ClientService {
         
         Client savedClient = clientRepository.save(client);
         logger.info("Client created successfully with ID: {}, identification: {}", savedClient.getClienteId(), savedClient.getIdentificacion());
-        return convertToDto(savedClient);
+        
+        // Publish client created event asynchronously via Kafka
+        ClientDto savedClientDto = convertToDto(savedClient);
+        eventPublisher.publishClientCreated(savedClientDto);
+        
+        return savedClientDto;
     }
     
     /**
@@ -137,7 +145,12 @@ public class ClientService {
         
         Client updatedClient = clientRepository.save(existingClient);
         logger.info("Client updated successfully with ID: {}", id);
-        return convertToDto(updatedClient);
+        
+        // Publish client updated event asynchronously via Kafka
+        ClientDto updatedClientDto = convertToDto(updatedClient);
+        eventPublisher.publishClientUpdated(updatedClientDto);
+        
+        return updatedClientDto;
     }
     
     /**
@@ -150,6 +163,10 @@ public class ClientService {
             throw new IllegalArgumentException("Client with ID " + id + " not found");
         }
         clientRepository.deleteById(id);
+        
+        // Publish client deleted event asynchronously via Kafka
+        eventPublisher.publishClientDeleted(id);
+        logger.info("Client deleted successfully with ID: {}", id);
     }
     
     /**
